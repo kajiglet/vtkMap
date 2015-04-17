@@ -82,7 +82,6 @@ public:
   std::vector<bool> MarkerSelected;  // for single-markers only (not clusters)
   std::vector<ClusteringNode*> AllNodes;   // for dev
 };
-
 //----------------------------------------------------------------------------
 vtkMapMarkerSet::vtkMapMarkerSet() : vtkPolydataFeature()
 {
@@ -114,7 +113,23 @@ void vtkMapMarkerSet::PrintSelf(ostream &os, vtkIndent indent)
      << indent << "Clustering: " << this->Clustering << "\n"
      << indent << "NumberOfMarkers: "
      << this->Internals->NumberOfMarkers
-     << std::endl;
+     << ", Cluster tree: \n";
+
+  for (int i=0; i<this->Internals->NodeTable.size(); i++)
+    {
+    std::set<ClusteringNode*> nodeSet = this->Internals->NodeTable[i];
+    int markerCount = 0;
+    int clusterCount = 0;
+    std::cout << "  " << i << " " << nodeSet.size() << ": ";
+    std::set<ClusteringNode*>::const_iterator iter;
+    for (iter = nodeSet.begin(); iter != nodeSet.end(); iter++)
+      {
+      ClusteringNode *node = *iter;
+      std::cout << " " << node->NumberOfMarkers;
+      }
+    std::cout << "\n";
+    }
+  os << std::endl;
 }
 
 //----------------------------------------------------------------------------
@@ -509,6 +524,12 @@ void vtkMapMarkerSet::Update()
     zoomLevel = NumberOfClusterLevels - 1;
     }
 
+  std::cout << "vtkMapMarkerSet::Update()"
+            << "  zoomLevel " << zoomLevel
+            << "  Clustering " << this->Clustering
+            << "  MarkersChanged " << this->Internals->MarkersChanged
+            << std::endl;
+
   // If not clustering, only update if markers have changed
   if (!this->Clustering && !this->Internals->MarkersChanged)
     {
@@ -578,6 +599,7 @@ void vtkMapMarkerSet::Update()
 
   this->Internals->CurrentNodes.clear();
   std::set<ClusteringNode*> nodeSet = this->Internals->NodeTable[zoomLevel];
+  std::cout << "nodeSet is size " << nodeSet.size() << std::endl;
   std::set<ClusteringNode*>::const_iterator iter;
   for (iter = nodeSet.begin(); iter != nodeSet.end(); iter++)
     {

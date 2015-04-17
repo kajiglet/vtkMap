@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   std::string inputFile;
   int clusteringOff = false;
   bool showHelp = false;
-  int zoomLevel = 10;
+  int zoomLevel = 8;
   std::vector<double> centerLatLon;
 
   vtksys::CommandLineArguments arg;
@@ -152,6 +152,8 @@ int main(int argc, char* argv[])
     double lon = iter->second;
     markerSet->AddMarker(lat, lon);
     }
+
+  markerSet->Print(std::cout);
 
   map->Draw();
 
